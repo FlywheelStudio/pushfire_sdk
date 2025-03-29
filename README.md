@@ -4,7 +4,9 @@ Including triggers, wait periods, personalized push notifications, and more.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+PushFire let's you set triggers to initiate workflows. Worfkflows consist of push notifications, wait periods, and decision trees. 
+
+This enables you to create complex user engagement sequences for onboarding, purchases, retargeting, and more.
 
 ## Getting started
 
