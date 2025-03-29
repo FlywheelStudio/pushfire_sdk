@@ -1,0 +1,31 @@
+name: pushfire_sdk
+description: A lightweight push notification tracking SDK for Firebase.
+homepage: https://github.com/yourusername/pushfire_sdk
+repository: https://github.com/yourusername/pushfire_sdk
+
+version: 0.0.1
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_messaging: ^14.7.0
+  http: ^0.13.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+# This section should be outside of `dev_dependencies`
+example:
+  path: example
+
+flutter:
+  # Add your assets or fonts here if needed in the future
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
