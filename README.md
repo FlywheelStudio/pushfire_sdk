@@ -14,7 +14,6 @@ void main() {
   PushTrackerSDK.initialize(serverUrl: "https://pushfire.app", userId: "[your_app_id]");
 }
 
-
 ## Additional information
 
 For more information about PushFire, please visit the official website: ore information about PushFire, please visit the official website: pushfire.app
