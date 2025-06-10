@@ -12,8 +12,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_messaging: ^14.7.0
-  http: ^0.13.6
+  firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
+  http: ^1.1.0
+  device_info_plus: ^9.1.1
+  package_info_plus: ^4.2.0
+  shared_preferences: ^2.2.2
+  logging: ^1.2.0
 
 dev_dependencies:
   flutter_test:
