@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'api/pushfire_api_client.dart';
 import 'config/pushfire_config.dart';
 import 'exceptions/pushfire_exceptions.dart';
@@ -176,7 +175,7 @@ class PushFireSDKImpl {
       // Always use current subscriber's externalId (backend doesn't allow updates)
       await _subscriberService.updateSubscriber(
         subscriberId: currentSubscriber!.id!,
-        externalId: currentSubscriber!.externalId,
+        externalId: currentSubscriber.externalId,
         name: name,
         email: email,
         phone: phone,
