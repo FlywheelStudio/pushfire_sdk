@@ -6,17 +6,18 @@ import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase first
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
   // Initialize PushFire SDK
   try {
     await PushFireSDK.initialize(
       PushFireConfig(
-        apiKey: 'b68f396b-96c4-4598-839b-d11c9903a038', // Replace with your actual API key
+        apiKey:
+            'b68f396b-96c4-4598-839b-d11c9903a038', // Replace with your actual API key
         enableLogging: true, // Enable for debugging
         timeoutSeconds: 30,
       ),
@@ -25,7 +26,7 @@ void main() async {
   } catch (e) {
     print('Failed to initialize PushFire SDK: $e');
   }
-  
+
   runApp(MyApp());
 }
 
@@ -55,23 +56,23 @@ class _PushFireExampleState extends State<PushFireExample> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _tagIdController = TextEditingController();
   final TextEditingController _tagValueController = TextEditingController();
-  
+
   Subscriber? _currentSubscriber;
   Device? _currentDevice;
   String _status = 'Ready';
-  
+
   late StreamSubscription _deviceSubscription;
   late StreamSubscription _subscriberLoginSubscription;
   late StreamSubscription _subscriberLogoutSubscription;
   late StreamSubscription _fcmSubscription;
-  
+
   @override
   void initState() {
     super.initState();
     _setupEventListeners();
     _loadCurrentData();
   }
-  
+
   void _setupEventListeners() {
     // Listen to device registration events
     _deviceSubscription = PushFireSDK.instance.onDeviceRegistered.listen(
@@ -83,9 +84,10 @@ class _PushFireExampleState extends State<PushFireExample> {
         print('Device registered: ${device.id}');
       },
     );
-    
+
     // Listen to subscriber login events
-    _subscriberLoginSubscription = PushFireSDK.instance.onSubscriberLoggedIn.listen(
+    _subscriberLoginSubscription =
+        PushFireSDK.instance.onSubscriberLoggedIn.listen(
       (subscriber) {
         setState(() {
           _currentSubscriber = subscriber;
@@ -94,9 +96,10 @@ class _PushFireExampleState extends State<PushFireExample> {
         print('Subscriber logged in: ${subscriber.name}');
       },
     );
-    
+
     // Listen to subscriber logout events
-    _subscriberLogoutSubscription = PushFireSDK.instance.onSubscriberLoggedOut.listen(
+    _subscriberLogoutSubscription =
+        PushFireSDK.instance.onSubscriberLoggedOut.listen(
       (_) {
         setState(() {
           _currentSubscriber = null;
@@ -116,12 +119,12 @@ class _PushFireExampleState extends State<PushFireExample> {
       },
     );
   }
-  
+
   Future<void> _loadCurrentData() async {
     try {
       final subscriber = await PushFireSDK.instance.getCurrentSubscriber();
       final device = PushFireSDK.instance.currentDevice;
-      
+
       setState(() {
         _currentSubscriber = subscriber;
         _currentDevice = device;
@@ -133,7 +136,7 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _loginSubscriber() async {
     if (_externalIdController.text.isEmpty) {
       setState(() {
@@ -141,19 +144,19 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
       return;
     }
-    
+
     try {
       setState(() {
         _status = 'Logging in subscriber...';
       });
-      
+
       final subscriber = await PushFireSDK.instance.loginSubscriber(
         externalId: _externalIdController.text,
         name: _nameController.text.isNotEmpty ? _nameController.text : null,
         email: _emailController.text.isNotEmpty ? _emailController.text : null,
         phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
       );
-      
+
       setState(() {
         _currentSubscriber = subscriber;
         _status = 'Subscriber logged in successfully';
@@ -164,7 +167,7 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _updateSubscriber() async {
     if (_currentSubscriber == null) {
       setState(() {
@@ -172,18 +175,18 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
       return;
     }
-    
+
     try {
       setState(() {
         _status = 'Updating subscriber...';
       });
-      
+
       final subscriber = await PushFireSDK.instance.updateSubscriber(
         name: _nameController.text.isNotEmpty ? _nameController.text : null,
         email: _emailController.text.isNotEmpty ? _emailController.text : null,
         phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
       );
-      
+
       setState(() {
         _currentSubscriber = subscriber;
         _status = 'Subscriber updated successfully';
@@ -194,15 +197,15 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _logoutSubscriber() async {
     try {
       setState(() {
         _status = 'Logging out subscriber...';
       });
-      
+
       await PushFireSDK.instance.logoutSubscriber();
-      
+
       setState(() {
         _currentSubscriber = null;
         _status = 'Subscriber logged out successfully';
@@ -213,7 +216,7 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _addTag() async {
     if (_tagIdController.text.isEmpty || _tagValueController.text.isEmpty) {
       setState(() {
@@ -221,28 +224,28 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
       return;
     }
-    
+
     if (_currentSubscriber == null) {
       setState(() {
         _status = 'No subscriber logged in';
       });
       return;
     }
-    
+
     try {
       setState(() {
         _status = 'Adding tag...';
       });
-      
+
       final tag = await PushFireSDK.instance.addTag(
         _tagIdController.text,
         _tagValueController.text,
       );
-      
+
       setState(() {
         _status = 'Tag added: ${tag.tagId} = ${tag.value}';
       });
-      
+
       _tagIdController.clear();
       _tagValueController.clear();
     } catch (e) {
@@ -251,7 +254,7 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _removeTag() async {
     if (_tagIdController.text.isEmpty) {
       setState(() {
@@ -259,25 +262,25 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
       return;
     }
-    
+
     if (_currentSubscriber == null) {
       setState(() {
         _status = 'No subscriber logged in';
       });
       return;
     }
-    
+
     try {
       setState(() {
         _status = 'Removing tag...';
       });
-      
+
       await PushFireSDK.instance.removeTag(_tagIdController.text);
-      
+
       setState(() {
         _status = 'Tag removed: ${_tagIdController.text}';
       });
-      
+
       _tagIdController.clear();
     } catch (e) {
       setState(() {
@@ -285,7 +288,7 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _addMultipleTags() async {
     if (_currentSubscriber == null) {
       setState(() {
@@ -293,19 +296,19 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
       return;
     }
-    
+
     try {
       setState(() {
         _status = 'Adding multiple tags...';
       });
-      
+
       final tags = await PushFireSDK.instance.addTags({
         'user_type': 'premium',
         'subscription_plan': 'yearly',
         'region': 'us-west',
         'app_version': '1.0.0',
       });
-      
+
       setState(() {
         _status = 'Added ${tags.length} tags successfully';
       });
@@ -315,21 +318,21 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   Future<void> _resetSDK() async {
     try {
       setState(() {
         _status = 'Resetting SDK...';
       });
-      
+
       await PushFireSDK.instance.reset();
-      
+
       setState(() {
         _currentSubscriber = null;
         _currentDevice = null;
         _status = 'SDK reset successfully';
       });
-      
+
       // Clear form fields
       _externalIdController.clear();
       _nameController.clear();
@@ -343,24 +346,24 @@ class _PushFireExampleState extends State<PushFireExample> {
       });
     }
   }
-  
+
   @override
   void dispose() {
     _deviceSubscription.cancel();
     _subscriberLoginSubscription.cancel();
     _subscriberLogoutSubscription.cancel();
     _fcmSubscription.cancel();
-    
+
     _externalIdController.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _tagIdController.dispose();
     _tagValueController.dispose();
-    
+
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -392,9 +395,9 @@ class _PushFireExampleState extends State<PushFireExample> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Current Data Card
             Card(
               child: Padding(
@@ -407,17 +410,21 @@ class _PushFireExampleState extends State<PushFireExample> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     SizedBox(height: 8),
-                    Text('Device ID: ${_currentDevice?.id ?? 'Not registered'}'),
-                    Text('Subscriber ID: ${_currentSubscriber?.id ?? 'Not logged in'}'),
-                    Text('Subscriber Name: ${_currentSubscriber?.name ?? 'N/A'}'),
-                    Text('Subscriber Email: ${_currentSubscriber?.email ?? 'N/A'}'),
+                    Text(
+                        'Device ID: ${_currentDevice?.id ?? 'Not registered'}'),
+                    Text(
+                        'Subscriber ID: ${_currentSubscriber?.id ?? 'Not logged in'}'),
+                    Text(
+                        'Subscriber Name: ${_currentSubscriber?.name ?? 'N/A'}'),
+                    Text(
+                        'Subscriber Email: ${_currentSubscriber?.email ?? 'N/A'}'),
                   ],
                 ),
               ),
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Subscriber Form Card
             Card(
               child: Padding(
@@ -475,14 +482,18 @@ class _PushFireExampleState extends State<PushFireExample> {
                         SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _currentSubscriber != null ? _updateSubscriber : null,
+                            onPressed: _currentSubscriber != null
+                                ? _updateSubscriber
+                                : null,
                             child: Text('Update'),
                           ),
                         ),
                         SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _currentSubscriber != null ? _logoutSubscriber : null,
+                            onPressed: _currentSubscriber != null
+                                ? _logoutSubscriber
+                                : null,
                             child: Text('Logout'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red,
@@ -495,9 +506,9 @@ class _PushFireExampleState extends State<PushFireExample> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Tag Management Card
             Card(
               child: Padding(
@@ -530,14 +541,16 @@ class _PushFireExampleState extends State<PushFireExample> {
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _currentSubscriber != null ? _addTag : null,
+                            onPressed:
+                                _currentSubscriber != null ? _addTag : null,
                             child: Text('Add Tag'),
                           ),
                         ),
                         SizedBox(width: 8),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: _currentSubscriber != null ? _removeTag : null,
+                            onPressed:
+                                _currentSubscriber != null ? _removeTag : null,
                             child: Text('Remove Tag'),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
@@ -550,7 +563,9 @@ class _PushFireExampleState extends State<PushFireExample> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _currentSubscriber != null ? _addMultipleTags : null,
+                        onPressed: _currentSubscriber != null
+                            ? _addMultipleTags
+                            : null,
                         child: Text('Add Sample Tags'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -561,9 +576,9 @@ class _PushFireExampleState extends State<PushFireExample> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 16),
-            
+
             // Advanced Actions Card
             Card(
               child: Padding(

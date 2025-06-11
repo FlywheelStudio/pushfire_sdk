@@ -2,15 +2,15 @@
 abstract class PushFireException implements Exception {
   /// Error message
   final String message;
-  
+
   /// Optional error code
   final String? code;
-  
+
   /// Optional underlying error
   final dynamic originalError;
-  
+
   const PushFireException(this.message, {this.code, this.originalError});
-  
+
   @override
   String toString() {
     if (code != null) {
@@ -24,10 +24,10 @@ abstract class PushFireException implements Exception {
 class PushFireApiException extends PushFireException {
   /// HTTP status code
   final int? statusCode;
-  
+
   /// Response body
   final String? responseBody;
-  
+
   const PushFireApiException(
     super.message, {
     super.code,
@@ -35,7 +35,7 @@ class PushFireApiException extends PushFireException {
     this.statusCode,
     this.responseBody,
   });
-  
+
   @override
   String toString() {
     final buffer = StringBuffer('PushFireApiException');
@@ -49,22 +49,26 @@ class PushFireApiException extends PushFireException {
 /// Exception thrown when SDK is not initialized
 class PushFireNotInitializedException extends PushFireException {
   const PushFireNotInitializedException()
-      : super('PushFire SDK is not initialized. Call PushFireSDK.initialize() first.');
+      : super(
+            'PushFire SDK is not initialized. Call PushFireSDK.initialize() first.');
 }
 
 /// Exception thrown when configuration is invalid
 class PushFireConfigurationException extends PushFireException {
-  const PushFireConfigurationException(super.message, {super.code, super.originalError});
+  const PushFireConfigurationException(super.message,
+      {super.code, super.originalError});
 }
 
 /// Exception thrown when device registration fails
 class PushFireDeviceException extends PushFireException {
-  const PushFireDeviceException(super.message, {super.code, super.originalError});
+  const PushFireDeviceException(super.message,
+      {super.code, super.originalError});
 }
 
 /// Exception thrown when subscriber operations fail
 class PushFireSubscriberException extends PushFireException {
-  const PushFireSubscriberException(super.message, {super.code, super.originalError});
+  const PushFireSubscriberException(super.message,
+      {super.code, super.originalError});
 }
 
 /// Exception thrown when tag operations fail
@@ -74,5 +78,6 @@ class PushFireTagException extends PushFireException {
 
 /// Exception thrown when network operations fail
 class PushFireNetworkException extends PushFireException {
-  const PushFireNetworkException(super.message, {super.code, super.originalError});
+  const PushFireNetworkException(super.message,
+      {super.code, super.originalError});
 }

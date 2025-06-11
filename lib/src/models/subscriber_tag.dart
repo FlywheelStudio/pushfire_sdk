@@ -2,19 +2,19 @@
 class SubscriberTag {
   /// Unique tag identifier
   final String tagId;
-  
+
   /// Subscriber identifier
   final String subscriberId;
-  
+
   /// Tag value
   final String value;
-  
+
   const SubscriberTag({
     required this.tagId,
     required this.subscriberId,
     required this.value,
   });
-  
+
   /// Create a SubscriberTag from JSON
   factory SubscriberTag.fromJson(Map<String, dynamic> json) {
     return SubscriberTag(
@@ -23,7 +23,7 @@ class SubscriberTag {
       value: json['value'] as String,
     );
   }
-  
+
   /// Convert SubscriberTag to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -32,7 +32,7 @@ class SubscriberTag {
       'value': value,
     };
   }
-  
+
   /// Create a copy of this tag with updated values
   SubscriberTag copyWith({
     String? tagId,
@@ -45,12 +45,12 @@ class SubscriberTag {
       value: value ?? this.value,
     );
   }
-  
+
   @override
   String toString() {
     return 'SubscriberTag(tagId: $tagId, subscriberId: $subscriberId, value: $value)';
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -59,7 +59,7 @@ class SubscriberTag {
         other.subscriberId == subscriberId &&
         other.value == value;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(tagId, subscriberId, value);

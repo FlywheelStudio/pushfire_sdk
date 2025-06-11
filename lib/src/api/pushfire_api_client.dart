@@ -9,18 +9,18 @@ import '../utils/logger.dart';
 class PushFireApiClient {
   final PushFireConfig _config;
   late final http.Client _httpClient;
-  
+
   PushFireApiClient(this._config) {
     _httpClient = http.Client();
   }
-  
+
   /// Get common headers for API requests
   Map<String, String> get _headers => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer ${_config.apiKey}',
-  };
-  
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${_config.apiKey}',
+      };
+
   /// Make a POST request
   Future<Map<String, dynamic>> post(
     String endpoint,
@@ -28,7 +28,7 @@ class PushFireApiClient {
   ) async {
     return _makeRequest('POST', endpoint, data);
   }
-  
+
   /// Make a PATCH request
   Future<Map<String, dynamic>> patch(
     String endpoint,
@@ -36,7 +36,7 @@ class PushFireApiClient {
   ) async {
     return _makeRequest('PATCH', endpoint, data);
   }
-  
+
   /// Make a DELETE request
   Future<Map<String, dynamic>> delete(
     String endpoint,
@@ -44,7 +44,7 @@ class PushFireApiClient {
   ) async {
     return _makeRequest('DELETE', endpoint, data);
   }
-  
+
   /// Make an HTTP request
   Future<Map<String, dynamic>> _makeRequest(
     String method,
@@ -53,12 +53,12 @@ class PushFireApiClient {
   ) async {
     final url = Uri.parse('${_config.baseUrl}$endpoint');
     final body = json.encode(data);
-    
+
     PushFireLogger.logApiRequest(method, url.toString(), data);
-    
+
     try {
       late http.Response response;
-      
+
       switch (method) {
         case 'POST':
           response = await _httpClient
@@ -78,14 +78,14 @@ class PushFireApiClient {
         default:
           throw PushFireApiException('Unsupported HTTP method: $method');
       }
-      
+
       PushFireLogger.logApiResponse(
         method,
         url.toString(),
         response.statusCode,
         response.body,
       );
-      
+
       return _handleResponse(response);
     } on SocketException catch (e) {
       PushFireLogger.error('Network error: ${e.message}', e);
@@ -107,18 +107,18 @@ class PushFireApiClient {
       );
     }
   }
-  
+
   /// Handle HTTP response
   Map<String, dynamic> _handleResponse(http.Response response) {
     final statusCode = response.statusCode;
     final body = response.body;
-    
+
     // Success status codes
     if (statusCode >= 200 && statusCode < 300) {
       if (body.isEmpty) {
         return {'success': true};
       }
-      
+
       try {
         final decoded = json.decode(body) as Map<String, dynamic>;
         return decoded;
@@ -127,21 +127,21 @@ class PushFireApiClient {
         return {'success': true, 'raw_response': body};
       }
     }
-    
+
     // Error status codes
     String errorMessage;
     String? errorCode;
-    
+
     try {
       final decoded = json.decode(body) as Map<String, dynamic>;
-      errorMessage = decoded['message'] as String? ?? 
-                    decoded['error'] as String? ?? 
-                    'API request failed';
+      errorMessage = decoded['message'] as String? ??
+          decoded['error'] as String? ??
+          'API request failed';
       errorCode = decoded['code'] as String?;
     } catch (e) {
       errorMessage = 'API request failed with status $statusCode';
     }
-    
+
     throw PushFireApiException(
       errorMessage,
       code: errorCode,
@@ -149,7 +149,7 @@ class PushFireApiClient {
       responseBody: body,
     );
   }
-  
+
   /// Dispose the HTTP client
   void dispose() {
     _httpClient.close();

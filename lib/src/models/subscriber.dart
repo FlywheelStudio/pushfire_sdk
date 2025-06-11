@@ -2,22 +2,22 @@
 class Subscriber {
   /// Unique subscriber identifier
   final String? id;
-  
+
   /// Device ID associated with this subscriber
   final String? deviceId;
-  
+
   /// External ID from your system
   final String externalId;
-  
+
   /// Subscriber name
   final String? name;
-  
+
   /// Subscriber email
   final String? email;
-  
+
   /// Subscriber phone number
   final String? phone;
-  
+
   const Subscriber({
     this.id,
     this.deviceId,
@@ -26,7 +26,7 @@ class Subscriber {
     this.email,
     this.phone,
   });
-  
+
   /// Create a Subscriber from JSON
   factory Subscriber.fromJson(Map<String, dynamic> json) {
     return Subscriber(
@@ -38,21 +38,21 @@ class Subscriber {
       phone: json['phone'] as String?,
     );
   }
-  
+
   /// Convert Subscriber to JSON
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
-    
+
     if (id != null) json['id'] = id;
     if (deviceId != null) json['deviceId'] = deviceId;
     json['externalId'] = externalId;
     if (name != null) json['name'] = name;
     if (email != null) json['email'] = email;
     if (phone != null) json['phone'] = phone;
-    
+
     return json;
   }
-  
+
   /// Create a copy of this subscriber with updated values
   Subscriber copyWith({
     String? id,
@@ -71,12 +71,12 @@ class Subscriber {
       phone: phone ?? this.phone,
     );
   }
-  
+
   @override
   String toString() {
     return 'Subscriber(id: $id, externalId: $externalId, name: $name, email: $email)';
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -88,7 +88,7 @@ class Subscriber {
         other.email == email &&
         other.phone == phone;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(

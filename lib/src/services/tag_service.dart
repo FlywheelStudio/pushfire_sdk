@@ -8,14 +8,14 @@ import 'subscriber_service.dart';
 class TagService {
   final PushFireApiClient _apiClient;
   final SubscriberService _subscriberService;
-  
+
   TagService(this._apiClient, this._subscriberService);
-  
+
   /// Add a tag to the current subscriber
   Future<SubscriberTag> addTag(String tagId, String value) async {
     try {
       PushFireLogger.info('Adding tag: $tagId = $value');
-      
+
       // Get current subscriber ID
       final subscriberId = await _subscriberService.getSubscriberId();
       if (subscriberId == null) {
@@ -23,7 +23,7 @@ class TagService {
           'No subscriber logged in. Call loginSubscriber() first.',
         );
       }
-      
+
       // Create tag data
       final tagData = {
         'data': {
@@ -32,17 +32,17 @@ class TagService {
           'value': value,
         },
       };
-      
+
       // Make API call
       await _apiClient.post('add-subscriber-tag', tagData);
-      
+
       // Create tag object
       final tag = SubscriberTag(
         tagId: tagId,
         subscriberId: subscriberId,
         value: value,
       );
-      
+
       PushFireLogger.info('Tag added successfully: $tagId');
       return tag;
     } catch (e) {
@@ -56,12 +56,12 @@ class TagService {
       );
     }
   }
-  
+
   /// Update a tag value for the current subscriber
   Future<SubscriberTag> updateTag(String tagId, String value) async {
     try {
       PushFireLogger.info('Updating tag: $tagId = $value');
-      
+
       // Get current subscriber ID
       final subscriberId = await _subscriberService.getSubscriberId();
       if (subscriberId == null) {
@@ -69,7 +69,7 @@ class TagService {
           'No subscriber logged in. Call loginSubscriber() first.',
         );
       }
-      
+
       // Create tag data
       final tagData = {
         'data': {
@@ -78,17 +78,17 @@ class TagService {
           'value': value,
         },
       };
-      
+
       // Make API call
       await _apiClient.patch('update-subscriber-tag', tagData);
-      
+
       // Create tag object
       final tag = SubscriberTag(
         tagId: tagId,
         subscriberId: subscriberId,
         value: value,
       );
-      
+
       PushFireLogger.info('Tag updated successfully: $tagId');
       return tag;
     } catch (e) {
@@ -102,12 +102,12 @@ class TagService {
       );
     }
   }
-  
+
   /// Remove a tag from the current subscriber
   Future<void> removeTag(String tagId) async {
     try {
       PushFireLogger.info('Removing tag: $tagId');
-      
+
       // Get current subscriber ID
       final subscriberId = await _subscriberService.getSubscriberId();
       if (subscriberId == null) {
@@ -115,7 +115,7 @@ class TagService {
           'No subscriber logged in. Call loginSubscriber() first.',
         );
       }
-      
+
       // Create tag data
       final tagData = {
         'data': {
@@ -123,10 +123,10 @@ class TagService {
           'subscriberId': subscriberId,
         },
       };
-      
+
       // Make API call
       await _apiClient.delete('remove-subscriber-tag', tagData);
-      
+
       PushFireLogger.info('Tag removed successfully: $tagId');
     } catch (e) {
       PushFireLogger.error('Failed to remove tag', e);
@@ -139,12 +139,12 @@ class TagService {
       );
     }
   }
-  
+
   /// Add multiple tags at once
   Future<List<SubscriberTag>> addTags(Map<String, String> tags) async {
     final results = <SubscriberTag>[];
     final errors = <String, dynamic>{};
-    
+
     for (final entry in tags.entries) {
       try {
         final tag = await addTag(entry.key, entry.value);
@@ -154,27 +154,27 @@ class TagService {
         PushFireLogger.warning('Failed to add tag ${entry.key}: $e');
       }
     }
-    
+
     if (errors.isNotEmpty && results.isEmpty) {
       throw PushFireTagException(
         'Failed to add all tags: ${errors.keys.join(", ")}',
       );
     }
-    
+
     if (errors.isNotEmpty) {
       PushFireLogger.warning(
         'Some tags failed to add: ${errors.keys.join(", ")}',
       );
     }
-    
+
     return results;
   }
-  
+
   /// Update multiple tags at once
   Future<List<SubscriberTag>> updateTags(Map<String, String> tags) async {
     final results = <SubscriberTag>[];
     final errors = <String, dynamic>{};
-    
+
     for (final entry in tags.entries) {
       try {
         final tag = await updateTag(entry.key, entry.value);
@@ -184,26 +184,26 @@ class TagService {
         PushFireLogger.warning('Failed to update tag ${entry.key}: $e');
       }
     }
-    
+
     if (errors.isNotEmpty && results.isEmpty) {
       throw PushFireTagException(
         'Failed to update all tags: ${errors.keys.join(", ")}',
       );
     }
-    
+
     if (errors.isNotEmpty) {
       PushFireLogger.warning(
         'Some tags failed to update: ${errors.keys.join(", ")}',
       );
     }
-    
+
     return results;
   }
-  
+
   /// Remove multiple tags at once
   Future<void> removeTags(List<String> tagIds) async {
     final errors = <String, dynamic>{};
-    
+
     for (final tagId in tagIds) {
       try {
         await removeTag(tagId);
@@ -212,7 +212,7 @@ class TagService {
         PushFireLogger.warning('Failed to remove tag $tagId: $e');
       }
     }
-    
+
     if (errors.isNotEmpty) {
       if (errors.length == tagIds.length) {
         throw PushFireTagException(

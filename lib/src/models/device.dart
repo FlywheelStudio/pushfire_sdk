@@ -2,31 +2,31 @@
 class Device {
   /// Unique device identifier
   final String? id;
-  
+
   /// Firebase Cloud Messaging token
   final String fcmToken;
-  
+
   /// Operating system (ios/android)
   final String os;
-  
+
   /// Operating system version
   final String osVersion;
-  
+
   /// Device language
   final String language;
-  
+
   /// Device manufacturer
   final String manufacturer;
-  
+
   /// Device model
   final String model;
-  
+
   /// App version
   final String appVersion;
-  
+
   /// Whether push notifications are enabled
   final bool pushNotificationEnabled;
-  
+
   const Device({
     this.id,
     required this.fcmToken,
@@ -38,7 +38,7 @@ class Device {
     required this.appVersion,
     required this.pushNotificationEnabled,
   });
-  
+
   /// Create a Device from JSON
   factory Device.fromJson(Map<String, dynamic> json) {
     return Device(
@@ -53,7 +53,7 @@ class Device {
       pushNotificationEnabled: json['pushNotificationEnabled'] as bool,
     );
   }
-  
+
   /// Convert Device to JSON
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
@@ -66,14 +66,14 @@ class Device {
       'appVersion': appVersion,
       'pushNotificationEnabled': pushNotificationEnabled,
     };
-    
+
     if (id != null) {
       json['id'] = id;
     }
-    
+
     return json;
   }
-  
+
   /// Create a copy of this device with updated values
   Device copyWith({
     String? id,
@@ -95,15 +95,16 @@ class Device {
       manufacturer: manufacturer ?? this.manufacturer,
       model: model ?? this.model,
       appVersion: appVersion ?? this.appVersion,
-      pushNotificationEnabled: pushNotificationEnabled ?? this.pushNotificationEnabled,
+      pushNotificationEnabled:
+          pushNotificationEnabled ?? this.pushNotificationEnabled,
     );
   }
-  
+
   @override
   String toString() {
     return 'Device(id: $id, os: $os, model: $model, pushNotificationEnabled: $pushNotificationEnabled)';
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -118,7 +119,7 @@ class Device {
         other.appVersion == appVersion &&
         other.pushNotificationEnabled == pushNotificationEnabled;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(

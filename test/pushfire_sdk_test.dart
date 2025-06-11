@@ -8,7 +8,7 @@ void main() {
         apiKey: 'test_api_key',
         baseUrl: 'https://test.pushfire.com',
       );
-      
+
       expect(config.apiKey, 'test_api_key');
       expect(config.baseUrl, 'https://test.pushfire.com');
       expect(config.enableLogging, false);
@@ -27,7 +27,7 @@ void main() {
         appVersion: '1.0.0',
         pushNotificationEnabled: true,
       );
-      
+
       expect(device.id, 'test_id');
       expect(device.fcmToken, 'test_token');
       expect(device.os, 'iOS');
@@ -42,7 +42,7 @@ void main() {
         email: 'test@example.com',
         phone: '+1234567890',
       );
-      
+
       expect(subscriber.id, 'sub_id');
       expect(subscriber.name, 'Test User');
       expect(subscriber.email, 'test@example.com');

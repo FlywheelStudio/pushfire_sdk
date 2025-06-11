@@ -13,23 +13,23 @@ class DeviceService {
   final PushFireApiClient _apiClient;
   static const String _deviceIdKey = 'pushfire_device_id';
   static const String _fcmTokenKey = 'pushfire_fcm_token';
-  
+
   DeviceService(this._apiClient);
-  
+
   /// Register or update device automatically
   Future<Device> registerDevice() async {
     try {
       PushFireLogger.info('Starting device registration');
-      
+
       // Get FCM token
       final fcmToken = await _getFcmToken();
       if (fcmToken == null) {
         throw const PushFireDeviceException('Failed to get FCM token');
       }
-      
+
       // Get device information
       final deviceInfo = await _getDeviceInfo();
-      
+
       // Create device object
       final device = Device(
         fcmToken: fcmToken,
@@ -41,51 +41,55 @@ class DeviceService {
         appVersion: deviceInfo['appVersion']!,
         pushNotificationEnabled: await _isPushNotificationEnabled(),
       );
-      
+
       PushFireLogger.logDeviceInfo(device.toJson());
-      
+
       // Check if device is already registered
       final prefs = await SharedPreferences.getInstance();
       final existingDeviceId = prefs.getString(_deviceIdKey);
       final lastFcmToken = prefs.getString(_fcmTokenKey);
-      
+
       Device registeredDevice;
-      
+
       if (existingDeviceId != null && lastFcmToken == fcmToken) {
         // Device already registered with same FCM token
-        PushFireLogger.info('Device already registered with ID: $existingDeviceId');
+        PushFireLogger.info(
+            'Device already registered with ID: $existingDeviceId');
         registeredDevice = device.copyWith(id: existingDeviceId);
       } else if (existingDeviceId != null) {
         // Device registered but FCM token changed - update
         PushFireLogger.info('Updating device with new FCM token');
-        registeredDevice = await _updateDevice(device.copyWith(id: existingDeviceId));
+        registeredDevice =
+            await _updateDevice(device.copyWith(id: existingDeviceId));
       } else {
         // New device registration
         PushFireLogger.info('Registering new device');
         registeredDevice = await _registerNewDevice(device);
       }
-      
+
       // Save device info
       await prefs.setString(_deviceIdKey, registeredDevice.id!);
       await prefs.setString(_fcmTokenKey, fcmToken);
-      
-      PushFireLogger.info('Device registration completed: ${registeredDevice.id}');
+
+      PushFireLogger.info(
+          'Device registration completed: ${registeredDevice.id}');
       return registeredDevice;
     } catch (e) {
       PushFireLogger.error('Device registration failed', e);
       if (e is PushFireException) {
         rethrow;
       }
-      throw PushFireDeviceException('Device registration failed: $e', originalError: e);
+      throw PushFireDeviceException('Device registration failed: $e',
+          originalError: e);
     }
   }
-  
+
   /// Register a new device
   Future<Device> _registerNewDevice(Device device) async {
     try {
       final deviceData = {'data': device.toJson()};
       final response = await _apiClient.post('register-device', deviceData);
-      
+
       // Extract device ID from response
       String? deviceId;
       if (response.containsKey('id')) {
@@ -96,20 +100,22 @@ class DeviceService {
         final data = response['data'] as Map<String, dynamic>;
         deviceId = data['id'] as String? ?? data['deviceId'] as String?;
       }
-      
+
       if (deviceId == null) {
-        throw const PushFireDeviceException('Device registration succeeded but no device ID returned');
+        throw const PushFireDeviceException(
+            'Device registration succeeded but no device ID returned');
       }
-      
+
       return device.copyWith(id: deviceId);
     } catch (e) {
       if (e is PushFireException) {
         rethrow;
       }
-      throw PushFireDeviceException('Failed to register device: $e', originalError: e);
+      throw PushFireDeviceException('Failed to register device: $e',
+          originalError: e);
     }
   }
-  
+
   /// Update existing device
   Future<Device> _updateDevice(Device device) async {
     try {
@@ -120,15 +126,16 @@ class DeviceService {
       if (e is PushFireException) {
         rethrow;
       }
-      throw PushFireDeviceException('Failed to update device: $e', originalError: e);
+      throw PushFireDeviceException('Failed to update device: $e',
+          originalError: e);
     }
   }
-  
+
   /// Get FCM token
   Future<String?> _getFcmToken() async {
     try {
       final messaging = FirebaseMessaging.instance;
-      
+
       // Request permission first
       final settings = await messaging.requestPermission(
         alert: true,
@@ -139,24 +146,24 @@ class DeviceService {
         provisional: false,
         sound: true,
       );
-      
+
       if (settings.authorizationStatus == AuthorizationStatus.denied) {
         PushFireLogger.warning('Push notification permission denied');
         return null;
       }
-      
+
       final token = await messaging.getToken();
       if (token != null) {
         PushFireLogger.logFcmToken(token);
       }
-      
+
       return token;
     } catch (e) {
       PushFireLogger.error('Failed to get FCM token', e);
       return null;
     }
   }
-  
+
   /// Check if push notifications are enabled
   Future<bool> _isPushNotificationEnabled() async {
     try {
@@ -168,12 +175,12 @@ class DeviceService {
       return false;
     }
   }
-  
+
   /// Get device information
   Future<Map<String, String>> _getDeviceInfo() async {
     final deviceInfoPlugin = DeviceInfoPlugin();
     final packageInfo = await PackageInfo.fromPlatform();
-    
+
     if (Platform.isAndroid) {
       final androidInfo = await deviceInfoPlugin.androidInfo;
       return {
@@ -198,13 +205,13 @@ class DeviceService {
       throw const PushFireDeviceException('Unsupported platform');
     }
   }
-  
+
   /// Get stored device ID
   Future<String?> getDeviceId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_deviceIdKey);
   }
-  
+
   /// Clear stored device data
   Future<void> clearDeviceData() async {
     final prefs = await SharedPreferences.getInstance();
