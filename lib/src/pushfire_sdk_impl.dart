@@ -7,9 +7,11 @@ import 'exceptions/pushfire_exceptions.dart';
 import 'models/device.dart';
 import 'models/subscriber.dart';
 import 'models/subscriber_tag.dart';
+import 'models/workflow_execution.dart';
 import 'services/device_service.dart';
 import 'services/subscriber_service.dart';
 import 'services/tag_service.dart';
+import 'services/workflow_service.dart';
 import 'utils/logger.dart';
 
 /// Main implementation of the PushFire SDK
@@ -22,6 +24,7 @@ class PushFireSDKImpl {
   late final DeviceService _deviceService;
   late final SubscriberService _subscriberService;
   late final TagService _tagService;
+  late final WorkflowService _workflowService;
 
   Device? _currentDevice;
   Subscriber? _currentSubscriber;
@@ -94,6 +97,7 @@ class PushFireSDKImpl {
     _deviceService = DeviceService(_apiClient);
     _subscriberService = SubscriberService(_apiClient, _deviceService);
     _tagService = TagService(_apiClient, _subscriberService);
+    _workflowService = WorkflowService(_apiClient);
 
     // Auto-register device
     await _autoRegisterDevice();
@@ -248,6 +252,68 @@ class PushFireSDKImpl {
   Future<void> removeTags(List<String> tagIds) async {
     _ensureInitialized();
     return await _tagService.removeTags(tagIds);
+  }
+
+  // Workflow execution methods
+
+  /// Create a workflow execution
+  Future<Map<String, dynamic>> createWorkflowExecution(
+    WorkflowExecutionRequest request,
+  ) async {
+    _ensureInitialized();
+    return await _workflowService.createWorkflowExecution(request);
+  }
+
+  /// Create an immediate workflow execution for subscribers
+  Future<Map<String, dynamic>> createImmediateWorkflowForSubscribers({
+    required String workflowId,
+    required List<String> subscriberIds,
+  }) async {
+    _ensureInitialized();
+    return await _workflowService.createImmediateWorkflowForSubscribers(
+      workflowId: workflowId,
+      subscriberIds: subscriberIds,
+    );
+  }
+
+  /// Create an immediate workflow execution for segments
+  Future<Map<String, dynamic>> createImmediateWorkflowForSegments({
+    required String workflowId,
+    required List<String> segmentIds,
+  }) async {
+    _ensureInitialized();
+    return await _workflowService.createImmediateWorkflowForSegments(
+      workflowId: workflowId,
+      segmentIds: segmentIds,
+    );
+  }
+
+  /// Create a scheduled workflow execution for subscribers
+  Future<Map<String, dynamic>> createScheduledWorkflowForSubscribers({
+    required String workflowId,
+    required List<String> subscriberIds,
+    required DateTime scheduledFor,
+  }) async {
+    _ensureInitialized();
+    return await _workflowService.createScheduledWorkflowForSubscribers(
+      workflowId: workflowId,
+      subscriberIds: subscriberIds,
+      scheduledFor: scheduledFor,
+    );
+  }
+
+  /// Create a scheduled workflow execution for segments
+  Future<Map<String, dynamic>> createScheduledWorkflowForSegments({
+    required String workflowId,
+    required List<String> segmentIds,
+    required DateTime scheduledFor,
+  }) async {
+    _ensureInitialized();
+    return await _workflowService.createScheduledWorkflowForSegments(
+      workflowId: workflowId,
+      segmentIds: segmentIds,
+      scheduledFor: scheduledFor,
+    );
   }
 
   /// Get current device

@@ -224,7 +224,94 @@ try {
 }
 ```
 
-### 4. Device Information
+### 4. Workflow Execution
+
+Execute automated workflows for targeted push notifications:
+
+#### Create Immediate Workflow
+
+```dart
+// Execute workflow immediately for specific subscribers
+try {
+  await PushFireSDK.instance.createImmediateWorkflowForSubscribers(
+    workflowId: 'welcome-series',
+    subscriberIds: ['sub1', 'sub2', 'sub3'],
+  );
+  print('Workflow executed for subscribers');
+} catch (e) {
+  print('Workflow execution failed: $e');
+}
+
+// Execute workflow immediately for segments
+try {
+  await PushFireSDK.instance.createImmediateWorkflowForSegments(
+    workflowId: 'promotion-campaign',
+    segmentIds: ['premium-users', 'active-users'],
+  );
+  print('Workflow executed for segments');
+} catch (e) {
+  print('Workflow execution failed: $e');
+}
+```
+
+#### Create Scheduled Workflow
+
+```dart
+// Schedule workflow for future execution
+final scheduleTime = DateTime.now().add(Duration(hours: 2));
+
+try {
+  await PushFireSDK.instance.createScheduledWorkflowForSubscribers(
+    workflowId: 'reminder-series',
+    subscriberIds: ['sub1', 'sub2'],
+    scheduleTime: scheduleTime,
+  );
+  print('Workflow scheduled for subscribers');
+} catch (e) {
+  print('Workflow scheduling failed: $e');
+}
+
+try {
+  await PushFireSDK.instance.createScheduledWorkflowForSegments(
+    workflowId: 'weekly-digest',
+    segmentIds: ['newsletter-subscribers'],
+    scheduleTime: scheduleTime,
+  );
+  print('Workflow scheduled for segments');
+} catch (e) {
+  print('Workflow scheduling failed: $e');
+}
+```
+
+#### Advanced Workflow Execution
+
+```dart
+// Create custom workflow execution request
+final request = WorkflowExecutionRequest(
+  workflowId: 'custom-workflow',
+  executionType: WorkflowExecutionType.scheduled,
+  scheduleTime: DateTime.now().add(Duration(days: 1)),
+  targets: [
+    WorkflowTarget(
+      type: WorkflowTargetType.subscriber,
+      ids: ['sub1', 'sub2'],
+    ),
+    WorkflowTarget(
+      type: WorkflowTargetType.segment,
+      ids: ['vip-users'],
+    ),
+  ],
+);
+
+try {
+  await PushFireSDK.instance.createWorkflowExecution(request);
+  print('Custom workflow execution created');
+} catch (e) {
+  print('Custom workflow execution failed: $e');
+}
+```
+
+### 5. Device Information
 
 ```dart
 // Get current device
@@ -244,7 +331,7 @@ final subscriberId = await PushFireSDK.instance.getSubscriberId();
 print('Subscriber ID: $subscriberId');
 ```
 
-### 5. Event Streams
+### 6. Event Streams
 
 Listen to real-time events:
 
@@ -300,7 +387,7 @@ class _MyAppState extends State<MyApp> {
 }
 ```
 
-### 6. Error Handling
+### 7. Error Handling
 
 The SDK provides specific exception types for different error scenarios:
 
@@ -320,7 +407,7 @@ try {
 }
 ```
 
-### 7. Advanced Usage
+### 8. Advanced Usage
 
 #### Reset SDK
 

@@ -5,6 +5,7 @@ export 'src/config/pushfire_config.dart';
 export 'src/models/device.dart';
 export 'src/models/subscriber.dart';
 export 'src/models/subscriber_tag.dart';
+export 'src/models/workflow_execution.dart';
 export 'src/exceptions/pushfire_exceptions.dart';
 
 import 'src/pushfire_sdk_impl.dart';
@@ -12,6 +13,7 @@ import 'src/config/pushfire_config.dart';
 import 'src/models/device.dart';
 import 'src/models/subscriber.dart';
 import 'src/models/subscriber_tag.dart';
+import 'src/models/workflow_execution.dart';
 
 /// Main PushFire SDK class
 ///
@@ -189,6 +191,94 @@ class PushFireSDK {
   /// May partially succeed - check logs for individual failures
   Future<void> removeTags(List<String> tagIds) async {
     await PushFireSDKImpl.instance.removeTags(tagIds);
+  }
+
+  // Workflow execution methods
+
+  /// Create a workflow execution
+  ///
+  /// [request] - The workflow execution request containing all necessary data
+  ///
+  /// Returns the API response as a Map
+  /// Throws [PushFireApiException] if the request fails
+  Future<Map<String, dynamic>> createWorkflowExecution(
+    WorkflowExecutionRequest request,
+  ) async {
+    return await PushFireSDKImpl.instance.createWorkflowExecution(request);
+  }
+
+  /// Create an immediate workflow execution for subscribers
+  ///
+  /// [workflowId] - UUID of the workflow to execute
+  /// [subscriberIds] - List of subscriber UUIDs to target
+  ///
+  /// Returns the API response as a Map
+  /// Throws [PushFireApiException] if the request fails
+  Future<Map<String, dynamic>> createImmediateWorkflowForSubscribers({
+    required String workflowId,
+    required List<String> subscriberIds,
+  }) async {
+    return await PushFireSDKImpl.instance.createImmediateWorkflowForSubscribers(
+      workflowId: workflowId,
+      subscriberIds: subscriberIds,
+    );
+  }
+
+  /// Create an immediate workflow execution for segments
+  ///
+  /// [workflowId] - UUID of the workflow to execute
+  /// [segmentIds] - List of segment UUIDs to target
+  ///
+  /// Returns the API response as a Map
+  /// Throws [PushFireApiException] if the request fails
+  Future<Map<String, dynamic>> createImmediateWorkflowForSegments({
+    required String workflowId,
+    required List<String> segmentIds,
+  }) async {
+    return await PushFireSDKImpl.instance.createImmediateWorkflowForSegments(
+      workflowId: workflowId,
+      segmentIds: segmentIds,
+    );
+  }
+
+  /// Create a scheduled workflow execution for subscribers
+  ///
+  /// [workflowId] - UUID of the workflow to execute
+  /// [subscriberIds] - List of subscriber UUIDs to target
+  /// [scheduledFor] - DateTime when the workflow should be executed
+  ///
+  /// Returns the API response as a Map
+  /// Throws [PushFireApiException] if the request fails
+  Future<Map<String, dynamic>> createScheduledWorkflowForSubscribers({
+    required String workflowId,
+    required List<String> subscriberIds,
+    required DateTime scheduledFor,
+  }) async {
+    return await PushFireSDKImpl.instance.createScheduledWorkflowForSubscribers(
+      workflowId: workflowId,
+      subscriberIds: subscriberIds,
+      scheduledFor: scheduledFor,
+    );
+  }
+
+  /// Create a scheduled workflow execution for segments
+  ///
+  /// [workflowId] - UUID of the workflow to execute
+  /// [segmentIds] - List of segment UUIDs to target
+  /// [scheduledFor] - DateTime when the workflow should be executed
+  ///
+  /// Returns the API response as a Map
+  /// Throws [PushFireApiException] if the request fails
+  Future<Map<String, dynamic>> createScheduledWorkflowForSegments({
+    required String workflowId,
+    required List<String> segmentIds,
+    required DateTime scheduledFor,
+  }) async {
+    return await PushFireSDKImpl.instance.createScheduledWorkflowForSegments(
+      workflowId: workflowId,
+      segmentIds: segmentIds,
+      scheduledFor: scheduledFor,
+    );
   }
 
   // Device and utility methods

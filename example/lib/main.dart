@@ -11,13 +11,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   // Initialize PushFire SDK
   try {
     await PushFireSDK.initialize(
       PushFireConfig(
         apiKey:
-            'b68f396b-96c4-4598-839b-d11c9903a038', // Replace with your actual API key
+            '370d68b4-9f91-46d3-af64-15247fd783eb', // Replace with your actual API key
         enableLogging: true, // Enable for debugging
         timeoutSeconds: 30,
       ),
@@ -56,6 +55,10 @@ class _PushFireExampleState extends State<PushFireExample> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _tagIdController = TextEditingController();
   final TextEditingController _tagValueController = TextEditingController();
+   final TextEditingController _workflowIdController = TextEditingController();
+  final TextEditingController _subscriberIdsController = TextEditingController();
+  final TextEditingController _segmentIdsController = TextEditingController();
+  DateTime? _selectedScheduleTime;
 
   Subscriber? _currentSubscriber;
   Device? _currentDevice;
@@ -340,10 +343,184 @@ class _PushFireExampleState extends State<PushFireExample> {
       _phoneController.clear();
       _tagIdController.clear();
       _tagValueController.clear();
+      _workflowIdController.clear();
+      _subscriberIdsController.clear();
+      _segmentIdsController.clear();
+      _selectedScheduleTime = null;
     } catch (e) {
       setState(() {
         _status = 'Reset failed: $e';
       });
+    }
+  }
+
+  Future<void> _createImmediateWorkflowForSubscribers() async {
+    if (_workflowIdController.text.isEmpty || _subscriberIdsController.text.isEmpty) {
+      setState(() {
+        _status = 'Please enter workflow ID and subscriber IDs';
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _status = 'Creating immediate workflow for subscribers...';
+      });
+
+      final subscriberIds = _subscriberIdsController.text
+          .split(',')
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      final result = await PushFireSDK.instance.createImmediateWorkflowForSubscribers(
+        workflowId: _workflowIdController.text,
+        subscriberIds: subscriberIds,
+      );
+
+      setState(() {
+        _status = 'Workflow created successfully: ${result['id'] ?? 'Unknown ID'}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Workflow creation failed: $e';
+      });
+    }
+  }
+
+  Future<void> _createImmediateWorkflowForSegments() async {
+    if (_workflowIdController.text.isEmpty || _segmentIdsController.text.isEmpty) {
+      setState(() {
+        _status = 'Please enter workflow ID and segment IDs';
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _status = 'Creating immediate workflow for segments...';
+      });
+
+      final segmentIds = _segmentIdsController.text
+          .split(',')
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      final result = await PushFireSDK.instance.createImmediateWorkflowForSegments(
+        workflowId: _workflowIdController.text,
+        segmentIds: segmentIds,
+      );
+
+      setState(() {
+        _status = 'Workflow created successfully: ${result['id'] ?? 'Unknown ID'}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Workflow creation failed: $e';
+      });
+    }
+  }
+
+  Future<void> _createScheduledWorkflowForSubscribers() async {
+    if (_workflowIdController.text.isEmpty || 
+        _subscriberIdsController.text.isEmpty || 
+        _selectedScheduleTime == null) {
+      setState(() {
+        _status = 'Please enter workflow ID, subscriber IDs, and select schedule time';
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _status = 'Creating scheduled workflow for subscribers...';
+      });
+
+      final subscriberIds = _subscriberIdsController.text
+          .split(',')
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      final result = await PushFireSDK.instance.createScheduledWorkflowForSubscribers(
+        workflowId: _workflowIdController.text,
+        subscriberIds: subscriberIds,
+        scheduledFor: _selectedScheduleTime!,
+      );
+
+      setState(() {
+        _status = 'Scheduled workflow created successfully: ${result['id'] ?? 'Unknown ID'}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Scheduled workflow creation failed: $e';
+      });
+    }
+  }
+
+  Future<void> _createScheduledWorkflowForSegments() async {
+    if (_workflowIdController.text.isEmpty || 
+        _segmentIdsController.text.isEmpty || 
+        _selectedScheduleTime == null) {
+      setState(() {
+        _status = 'Please enter workflow ID, segment IDs, and select schedule time';
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        _status = 'Creating scheduled workflow for segments...';
+      });
+
+      final segmentIds = _segmentIdsController.text
+          .split(',')
+          .map((id) => id.trim())
+          .where((id) => id.isNotEmpty)
+          .toList();
+
+      final result = await PushFireSDK.instance.createScheduledWorkflowForSegments(
+        workflowId: _workflowIdController.text,
+        segmentIds: segmentIds,
+        scheduledFor: _selectedScheduleTime!,
+      );
+
+      setState(() {
+        _status = 'Scheduled workflow created successfully: ${result['id'] ?? 'Unknown ID'}';
+      });
+    } catch (e) {
+      setState(() {
+        _status = 'Scheduled workflow creation failed: $e';
+      });
+    }
+  }
+
+  Future<void> _selectScheduleTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(Duration(hours: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 365)),
+    );
+
+    if (date != null) {
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1))),
+      );
+
+      if (time != null) {
+        setState(() {
+          _selectedScheduleTime = DateTime(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+          );
+        });
+      }
     }
   }
 
@@ -360,6 +537,9 @@ class _PushFireExampleState extends State<PushFireExample> {
     _phoneController.dispose();
     _tagIdController.dispose();
     _tagValueController.dispose();
+    _workflowIdController.dispose();
+    _subscriberIdsController.dispose();
+    _segmentIdsController.dispose();
 
     super.dispose();
   }
@@ -571,6 +751,137 @@ class _PushFireExampleState extends State<PushFireExample> {
                           backgroundColor: Colors.green,
                         ),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // Workflow Execution Card
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Workflow Execution',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _workflowIdController,
+                      decoration: InputDecoration(
+                        labelText: 'Workflow ID *',
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter workflow UUID',
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: _subscriberIdsController,
+                      decoration: InputDecoration(
+                        labelText: 'Subscriber IDs (comma-separated)',
+                        border: OutlineInputBorder(),
+                        hintText: 'uuid1, uuid2, uuid3',
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: _segmentIdsController,
+                      decoration: InputDecoration(
+                        labelText: 'Segment IDs (comma-separated)',
+                        border: OutlineInputBorder(),
+                        hintText: 'segment1, segment2, segment3',
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _selectedScheduleTime != null
+                                ? 'Scheduled: ${_selectedScheduleTime!.toString().substring(0, 16)}'
+                                : 'No schedule time selected',
+                            style: TextStyle(
+                              color: _selectedScheduleTime != null
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: _selectScheduleTime,
+                          child: Text('Select Time'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Immediate Execution:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _createImmediateWorkflowForSubscribers,
+                            child: Text('For Subscribers'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _createImmediateWorkflowForSegments,
+                            child: Text('For Segments'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.indigo,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Scheduled Execution:',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _selectedScheduleTime != null
+                                ? _createScheduledWorkflowForSubscribers
+                                : null,
+                            child: Text('For Subscribers'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _selectedScheduleTime != null
+                                ? _createScheduledWorkflowForSegments
+                                : null,
+                            child: Text('For Segments'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.cyan,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
